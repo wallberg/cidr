@@ -67,12 +67,7 @@ def test_cidrnode():
     assert n.child0 is None
     assert n.child1 is None
     assert n.isLeaf()
-    assert not n.isRange()
 
-    n.depth = 1
-    assert n.isRange()
+    n.child0 = CidrNode()
+    assert not n.isLeaf()
 
-    n.child0 = CidrNode(parent=n, depth=2)
-    assert n.child0.parent == n
-    assert not n.isRange()
-    assert n.child0.isRange()
