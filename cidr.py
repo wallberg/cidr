@@ -47,6 +47,9 @@ class Cidr:
             self.ip & 255,
             self.bits)
 
+    def __eq__(self, b):
+        return self.ip == b.ip and self.bits == b.bits
+
 
 class CidrNode:
     """ Represent a single node in a CidrSet tree. """

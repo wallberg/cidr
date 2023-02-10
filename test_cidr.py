@@ -45,6 +45,21 @@ def test_cidr_bit():
             assert c.bit(n) == 1
 
 
+def test_cidr_eq():
+    a = Cidr("255.255.255.255/1")
+    b = Cidr("128.0.0.0/1")
+    print(a.ip, a.bits, b.ip, b.bits)
+    assert a == b
+
+    a = Cidr("255.255.255.255/31")
+    b = Cidr("255.255.255.254/32")
+    assert a != b
+
+    a = Cidr("255.255.255.254/32")
+    b = Cidr("255.255.255.255/32")
+    assert a != b
+
+
 def test_cidrnode():
     n = CidrNode()
     assert n.parent is None
