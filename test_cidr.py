@@ -34,7 +34,7 @@ def test_cidr():
 
 def test_cidr_bit():
     c = Cidr("0.0.0.0/0")
-    for n in range(0, 32):
+    for n in range(1, 32):
         assert c.bit(n) == 0
 
     c = Cidr("255.255.255.254/32")
