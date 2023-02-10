@@ -1,6 +1,6 @@
 import pytest
 
-from .cidr import Cidr
+from .cidr import Cidr, CidrNode
 
 
 def test_cidr():
@@ -43,3 +43,21 @@ def test_cidr_bit():
             assert c.bit(n) == 0
         else:
             assert c.bit(n) == 1
+
+
+def test_cidrnode():
+    n = CidrNode()
+    assert n.parent is None
+    assert n.depth == 0
+    assert n.child0 is None
+    assert n.child1 is None
+    assert n.isLeaf()
+    assert not n.isRange()
+
+    n.depth = 1
+    assert n.isRange()
+
+    n.child0 = CidrNode(parent=n, depth=2)
+    assert n.child0.parent == n
+    assert not n.isRange()
+    assert n.child0.isRange()

@@ -47,3 +47,21 @@ class Cidr:
             self.ip & 255,
             self.bits)
 
+
+class CidrNode:
+    """ Represent a single node in a CidrSet tree. """
+
+    def __init__(self, parent=None, depth=0, child0=None, child1=None):
+        self.parent = parent  # parent CidrNode
+        self.depth = depth  # depth of the node in bits (1-32)
+        self.child0 = child0  # left branch - 0 bit
+        self.child1 = child1  # right branch - 1 bit
+
+    def isLeaf(self):
+        """ True if this is a leaf node, no children. """
+        return self.child0 is None and self.child1 is None
+
+    def isRange(self):
+        """ True if this is a leaf node and depth ∈ [1, 32). """
+        return self.isLeaf() and self.depth > 0 and self.depth < 32
+
