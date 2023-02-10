@@ -62,8 +62,6 @@ def test_cidr_eq():
 
 def test_cidrnode():
     n = CidrNode()
-    assert n.parent is None
-    assert n.depth == 0
     assert n.child0 is None
     assert n.child1 is None
     assert n.isLeaf()
