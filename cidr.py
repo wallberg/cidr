@@ -117,14 +117,11 @@ class CidrSet:
     def _cidrs(self, node: Node, ip: int, result: list):
         """ Traverse the tree, adding all Cidr values to the list. """
 
-        # print(node.value, ip, node.left is not None, node.right is not None)
-
+        # Base case, leaf node so add the Cidr
         if node.left is None and node.right is None:
-            # Leaf node, add the Cidr
             cidr = Cidr()
             cidr.ip = ip
             cidr.bits = node.value
-            # print(f'Add {cidr}')
             result.append(cidr)
             return
 
