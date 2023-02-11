@@ -1,6 +1,6 @@
 import pytest
 
-from .cidr import Cidr, CidrNode
+from .cidr import Cidr, CidrSet
 
 
 def test_cidr():
@@ -60,12 +60,17 @@ def test_cidr_eq():
     assert a != b
 
 
-def test_cidrnode():
-    n = CidrNode()
-    assert n.child0 is None
-    assert n.child1 is None
-    assert n.isLeaf()
+def test_cidrset():
+    s = CidrSet()
+    assert s.root is None
 
-    n.child0 = CidrNode()
-    assert not n.isLeaf()
-
+    s.add(Cidr("0.0.0.0/1"))
+    s.add(Cidr("0.0.0.0/2"))
+    s.add(Cidr("0.0.0.0/3"))
+    s.add(Cidr("255.0.0.0/4"))
+    s.add(Cidr("168.0.0.0/6"))
+    s.add(Cidr("255.255.255.255"))
+    s.add(Cidr("255.255.255.254"))
+    s.add(Cidr("255.0.0.0/8"))
+    s.add(Cidr("255.0.0.0/9"))
+    print(s.root)

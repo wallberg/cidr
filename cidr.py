@@ -1,5 +1,7 @@
 import re
 
+from binarytree import Node
+
 cidrPattern = re.compile(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2}))?$')
 
 
@@ -62,7 +64,43 @@ class CidrNode:
         """ True if this is a leaf node, no children. """
         return self.child0 is None and self.child1 is None
 
-    def isRange(self):
-        """ True if this is a leaf node and depth ∈ [1, 32). """
-        return self.isLeaf() and self.depth > 0 and self.depth < 32
 
+class CidrSet:
+    """ Represent a set of CIDR ranges as a binary tree. """
+
+    def __init__(self):
+        # Start empty
+        self.root = None
+
+    def add(self, cidr):
+        """ Add a new cidr to the set. """
+
+        # Store the depth in node.value and the bit values
+        # are implied (Node.left is 0 bit, Node.right is 1 bit)
+        if self.root is None:
+            self.root = Node(0)
+
+        self._add(self.root, cidr)
+
+    def _add(self, node, cidr):
+        """ Recursively add a new CIDR node to the set. """
+
+        if cidr.bits == node.value:
+            return
+
+        # Get depth and bit for the child node
+        depth = node.value+1
+        bit = cidr.bit(depth)
+
+        # Add a new child node (0 bit=left, 1 bit=right)
+        if bit == 0:
+            if node.left is None:
+                node.left = Node(depth)
+            child = node.left
+
+        else:
+            if node.right is None:
+                node.right = Node(depth)
+            child = node.right
+
+        self._add(child, cidr)
