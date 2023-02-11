@@ -49,6 +49,9 @@ class Cidr:
             self.ip & 255,
             self.bits)
 
+    def __rep__(self):
+        return str(self)
+
     def __eq__(self, b):
         return self.ip == b.ip and self.bits == b.bits
 
@@ -64,7 +67,7 @@ class CidrSet:
         """ Add a new cidr to the set. """
 
         # Store the depth in node.value and the bit values
-        # are implied (Node.left is 0 bit, Node.right is 1 bit)
+        # are implied by node.left (0 bit) and node.right (1 bit)
         if self.root is None:
             self.root = Node(0)
 
@@ -92,3 +95,32 @@ class CidrSet:
             child = node.right
 
         self._add(child, cidr)
+
+    def cidrs(self) -> list:
+        """ Output this set as a list of Cidr values. """
+
+        result = []
+        if self.root is not None:
+            self._cidrs(self.root, 0, result)
+
+        return result
+
+    def _cidrs(self, node: Node, ip: int, result: list):
+        """ Traverse the tree, adding all Cidr values to the list. """
+
+        # print(node.value, ip, node.left is not None, node.right is not None)
+
+        if node.left is None and node.right is None:
+            # Leaf node, add the Cidr
+            cidr = Cidr()
+            cidr.ip = ip
+            cidr.bits = node.value
+            # print(f'Add {cidr}')
+            result.append(cidr)
+            return
+
+        if node.left is not None:
+            self._cidrs(node.left, ip, result)
+
+        if node.right is not None:
+            self._cidrs(node.right, ip + 2**(32-node.right.value), result)
