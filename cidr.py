@@ -53,18 +53,6 @@ class Cidr:
         return self.ip == b.ip and self.bits == b.bits
 
 
-class CidrNode:
-    """ Represent a single node in a CidrSet tree. """
-
-    def __init__(self, child0=None, child1=None):
-        self.child0 = child0  # left branch - 0 bit
-        self.child1 = child1  # right branch - 1 bit
-
-    def isLeaf(self):
-        """ True if this is a leaf node, no children. """
-        return self.child0 is None and self.child1 is None
-
-
 class CidrSet:
     """ Represent a set of CIDR ranges as a binary tree. """
 
