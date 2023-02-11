@@ -1,0 +1,3 @@
+test:
+	pytest
+	pycodestyle *.py
