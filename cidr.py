@@ -67,7 +67,7 @@ class CidrSet:
         """ Add a new cidr to the set. """
 
         # Store the depth in node.value and the bit values
-        # are implied by node.left (0 bit) and node.right (1 bit)
+        # are implied on the edges by node.left (0 bit) and node.right (1 bit)
         if self.root is None:
             self.root = Node(0)
 
@@ -76,6 +76,7 @@ class CidrSet:
     def _add(self, node, cidr):
         """ Recursively add a new CIDR node to the set. """
 
+        # Base case, we've added a node for every bit, no more children
         if cidr.bits == node.value:
             return
 
@@ -83,18 +84,26 @@ class CidrSet:
         depth = node.value+1
         bit = cidr.bit(depth)
 
-        # Add a new child node (0 bit=left, 1 bit=right)
+        # Add a new child node
         if bit == 0:
             if node.left is None:
                 node.left = Node(depth)
             child = node.left
-
         else:
             if node.right is None:
                 node.right = Node(depth)
             child = node.right
 
+        # Recurse down to next level
         self._add(child, cidr)
+
+        # Check if a collapse is necessary because both child nodes are leaf nodes
+        if (node.left is not None and node.right is not None
+           and node.left.left is None and node.left.right is None
+           and node.right.left is None and node.right.right is None):
+
+            node.left = None
+            node.right = None
 
     def cidrs(self) -> list:
         """ Output this set as a list of Cidr values. """
