@@ -63,7 +63,44 @@ class CidrSet:
         # Start empty
         self.root = None
 
-    def add(self, cidr):
+    def __contains__(self, cidr):
+        if type(cidr) is not Cidr:
+            return False
+
+        return self.contains(cidr)
+
+    def contains(self, cidr: Cidr) -> bool:
+        """ Test if this cidr is in the set, ie every IP in the cidr is in the set. """
+        if self.root is None:
+            return False
+
+        return self._contains(self.root, cidr)
+
+    def _contains(self, node: Node, cidr: Cidr) -> bool:
+        """ Recursively test if this cidr is in the set. """
+
+        # Base case, we've reached a leaf node
+        if node.left is None and node.right is None:
+            return True
+
+        # Base case, we've reached the bottom of the cidr, but not a leaf node
+        if cidr.bits == node.value:
+            return False
+
+        # Get depth and bit for the child node
+        depth = node.value+1
+        bit = cidr.bit(depth)
+
+        if bit == 0:
+            if node.left is None:
+                return False
+            return self._contains(node.left, cidr)
+        else:
+            if node.right is None:
+                return False
+            return self._contains(node.right, cidr)
+
+    def add(self, cidr: Cidr):
         """ Add a new cidr to the set. """
 
         # Store the depth in node.value and the bit values
@@ -73,7 +110,7 @@ class CidrSet:
 
         self._add(self.root, cidr)
 
-    def _add(self, node, cidr):
+    def _add(self, node: Node, cidr: Cidr):
         """ Recursively add a new CIDR node to the set. """
 
         # Base case, we've added a node for every bit, no more children
@@ -105,6 +142,65 @@ class CidrSet:
             node.left = None
             node.right = None
 
+    def sub(self, cidr: Cidr):
+        """ Subtract a cidr to the set. """
+
+        if self.root is None:
+            # Set is already empty
+            return
+
+        if self._sub(self.root, cidr):
+            self.root = None
+
+    def _sub(self, node: Node, cidr: Cidr) -> bool:
+        """ Recursively subtract a CIDR node from the set.
+        Returns True if this node should be removed.
+        """
+
+        # Base case, we've reached the bottom of the cidr; perfect match
+        # so delete this node and any descendants
+        if cidr.bits == node.value:
+            return True
+
+        # Get depth and bit for the child node
+        depth = node.value+1
+        bit = cidr.bit(depth)
+
+        if bit == 0:
+            if node.left is None:
+                node.left = Node(depth)
+                if node.right is None:
+                    # Leaf node, trigger expansion
+                    node.right = Node(depth)
+
+            if self._sub(node.left, cidr):
+                if node.right is None:
+                    # Now a leaf node, propogate the delete upward
+                    return True
+                node.left = None
+
+        else:
+            if node.right is None:
+                node.right = Node(depth)
+                if node.left is None:
+                    # Leaf node, trigger expansion
+                    node.left = Node(depth)
+
+            if self._sub(node.right, cidr):
+                if node.left is None:
+                    # Now a leaf node, propogate the delete upward
+                    return True
+                node.right = None
+
+        return False
+
+    def size(self) -> int:
+        """ Return the number of cidrs in this set. """
+        if self.root is None:
+            return 0
+
+        return self.root.leaf_count
+
     def cidrs(self) -> list:
         """ Output this set as a list of Cidr values. """
 
@@ -130,3 +226,9 @@ class CidrSet:
 
         if node.right is not None:
             self._cidrs(node.right, ip + 2**(32-node.right.value), result)
+
+    def __str__(self):
+        return ", ".join([str(cidr) for cidr in self.cidrs()])
+
+    def __rep__(self):
+        return self.__str__()
