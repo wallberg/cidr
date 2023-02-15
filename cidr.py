@@ -105,16 +105,25 @@ class CidrSet:
 
         # Store the depth in node.value and the bit values
         # are implied on the edges by node.left (0 bit) and node.right (1 bit)
+
         if self.root is None:
             self.root = Node(0)
+            self._add(self.root, True, cidr)
+        else:
+            self._add(self.root, False, cidr)
 
-        self._add(self.root, cidr)
-
-    def _add(self, node: Node, cidr: Cidr):
+    def _add(self, node: Node, newnode: bool, cidr: Cidr):
         """ Recursively add a new CIDR node to the set. """
 
         # Base case, we've added a node for every bit, no more children
+        # Existing children can be deleted
         if cidr.bits == node.value:
+            node.left = None
+            node.right = None
+            return
+
+        # Base case, we are at an existing leaf which already includes the cidr
+        if not newnode and node.left is None and node.right is None:
             return
 
         # Get depth and bit for the child node
@@ -122,17 +131,20 @@ class CidrSet:
         bit = cidr.bit(depth)
 
         # Add a new child node
+        newnode = False
         if bit == 0:
             if node.left is None:
                 node.left = Node(depth)
+                newnode = True
             child = node.left
         else:
             if node.right is None:
                 node.right = Node(depth)
+                newnode = True
             child = node.right
 
         # Recurse down to next level
-        self._add(child, cidr)
+        self._add(child, newnode, cidr)
 
         # Check if a collapse is necessary because both child nodes are leaf nodes
         if (node.left is not None and node.right is not None
@@ -141,6 +153,31 @@ class CidrSet:
 
             node.left = None
             node.right = None
+
+    def clone(self):
+        """ Make a clone of this CidrSet. """
+        c = CidrSet()
+        for cidr in self.cidrs():
+            c.add(cidr)
+        return c
+
+    def __add__(self, b):
+        """ Support the addition operator, for two CidrSet objects. """
+        if type(b) is not CidrSet:
+            raise ValueException("Second operand is not of type CidrSet")
+
+        c = self.clone()
+        for cidr in b.cidrs():
+            c.add(cidr)
+
+    def __sub__(self, b):
+        """ Support the subtraction operator, for two CidrSet objects. """
+        if type(b) is not CidrSet:
+            raise ValueException("Second operand is not of type CidrSet")
+
+        c = self.clone()
+        for cidr in b.cidrs():
+            c.sub(cidr)
 
     def sub(self, cidr: Cidr):
         """ Subtract a cidr to the set. """

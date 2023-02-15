@@ -100,6 +100,30 @@ def test_cidrset_contains():
     assert Cidr("128.0.0.0/2") not in s
 
 
+def test_cidrset_clone():
+    a = CidrSet()
+    b = a.clone()
+    assert b.root is None
+
+    a.add(Cidr("0.0.0.0/31"))
+    b = a.clone()
+    assert [str(cidr) for cidr in a.cidrs()] == [
+        "0.0.0.0/31",
+    ]
+    assert [str(cidr) for cidr in b.cidrs()] == [
+        "0.0.0.0/31",
+    ]
+
+    a.sub(Cidr("0.0.0.1/32"))
+    b.add(Cidr("0.0.0.0/30"))
+    assert [str(cidr) for cidr in a.cidrs()] == [
+        "0.0.0.0/32",
+    ]
+    assert [str(cidr) for cidr in b.cidrs()] == [
+        "0.0.0.0/30",
+    ]
+
+
 def test_cidrset_add():
 
     # Root-only Operations
@@ -113,82 +137,65 @@ def test_cidrset_add():
 
     # Add-only operations
     s = CidrSet()
-    s.add(Cidr("0.0.0.0/1"))
-    assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/1",
-    ]
 
     s.add(Cidr("0.0.0.0/3"))
     assert [str(cidr) for cidr in s.cidrs()] == [
         "0.0.0.0/3",
     ]
 
+    s.add(Cidr("0.0.0.0/1"))
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/1",
+    ]
+
     s.add(Cidr("0.0.0.0/2"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
+        "0.0.0.0/1",
     ]
 
     s.add(Cidr("255.0.0.0/4"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
+        "0.0.0.0/1",
         "240.0.0.0/4",
     ]
 
     s.add(Cidr("255.0.0.0/2"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
-        "240.0.0.0/4",
+        "0.0.0.0/1",
+        "192.0.0.0/2",
     ]
 
     s.add(Cidr("168.0.0.0/6"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
+        "0.0.0.0/1",
         "168.0.0.0/6",
-        "240.0.0.0/4",
+        "192.0.0.0/2",
     ]
 
     s.add(Cidr("255.255.255.255"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
+        "0.0.0.0/1",
         "168.0.0.0/6",
-        "255.255.255.255/32",
+        "192.0.0.0/2",
     ]
 
     # Add operations (with collapse)
+    s = CidrSet()
+    s.add(Cidr("255.255.255.255"))
     s.add(Cidr("255.255.255.254"))
     assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
-        "168.0.0.0/6",
-        "255.255.255.254/31",
-    ]
-
-    s.add(Cidr("255.0.0.0/8"))
-    assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
-        "168.0.0.0/6",
-        "255.255.255.254/31",
-    ]
-
-    s.add(Cidr("255.0.0.0/9"))
-    assert [str(cidr) for cidr in s.cidrs()] == [
-        "0.0.0.0/3",
-        "168.0.0.0/6",
-        "255.0.0.0/9",
         "255.255.255.254/31",
     ]
 
     s = CidrSet()
+    s.add(Cidr("0.0.0.0/8"))
+    s.add(Cidr("1.0.0.0/8"))
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/7",
+    ]
+
+    s = CidrSet()
     s.add(Cidr("128.0.0.0/1"))
-    assert [str(cidr) for cidr in s.cidrs()] == [
-        "128.0.0.0/1",
-    ]
-
-    s.add(Cidr("192.0.0.0/2"))
-    assert [str(cidr) for cidr in s.cidrs()] == [
-        "192.0.0.0/2",
-    ]
-
-    s.add(Cidr("128.0.0.0/2"))
     assert [str(cidr) for cidr in s.cidrs()] == [
         "128.0.0.0/1",
     ]
