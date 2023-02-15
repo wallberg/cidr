@@ -64,6 +64,7 @@ class CidrSet:
         self.root = None
 
     def __contains__(self, cidr):
+        """ Add support for the 'in' operator. """
         if type(cidr) is not Cidr:
             return False
 
@@ -169,6 +170,7 @@ class CidrSet:
         c = self.clone()
         for cidr in b.cidrs():
             c.add(cidr)
+        return c
 
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """
@@ -178,6 +180,7 @@ class CidrSet:
         c = self.clone()
         for cidr in b.cidrs():
             c.sub(cidr)
+        return c
 
     def sub(self, cidr: Cidr):
         """ Subtract a cidr to the set. """
@@ -230,6 +233,10 @@ class CidrSet:
                 node.right = None
 
         return False
+
+    def __len__(self):
+        """ Support the len() function. """
+        return self.size()
 
     def size(self) -> int:
         """ Return the number of cidrs in this set. """

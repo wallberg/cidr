@@ -103,6 +103,7 @@ def test_cidrset_contains():
 def test_cidrset_clone():
     a = CidrSet()
     b = a.clone()
+    assert type(b) is CidrSet
     assert b.root is None
 
     a.add(Cidr("0.0.0.0/31"))
@@ -318,3 +319,57 @@ def test_cidrset_sub():
     s.sub(Cidr("0.0.0.0/32"))
     assert [str(cidr) for cidr in s.cidrs()] == [
     ]
+
+
+def test_cidrset_addoperator():
+    a = CidrSet()
+    b = CidrSet()
+    s = a + b
+    assert type(s) is CidrSet
+    assert len(s) == 0
+
+    a.add(Cidr("0.0.0.0"))
+    s = a + b
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/32",
+    ]
+
+    b.add(Cidr("0.0.0.0"))
+    s = a + b
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/32",
+    ]
+
+    a.add(Cidr("255.255.255.255"))
+    s = a + b
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/32",
+        "255.255.255.255/32",
+    ]
+
+
+def test_cidrset_suboperator():
+    a = CidrSet()
+    b = CidrSet()
+    s = a - b
+    assert type(s) is CidrSet
+    assert len(s) == 0
+
+    b.add(Cidr("0.0.0.0"))
+    s = a - b
+    assert len(s) == 0
+
+    b -= b
+    assert len(b) == 0
+
+    a.add(Cidr("0.0.0.0/0"))
+    b.add(Cidr("0.0.0.0/2"))
+    b.add(Cidr("255.255.255.255/2"))
+    s = a - b
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "64.0.0.0/2",
+        "128.0.0.0/2"
+    ]
+
+    s = a - b - a
+    assert len(s) == 0
