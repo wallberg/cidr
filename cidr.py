@@ -158,8 +158,8 @@ class CidrSet:
     def clone(self):
         """ Make a clone of this CidrSet. """
         c = CidrSet()
-        for cidr in self.cidrs():
-            c.add(cidr)
+        if self.root is not None:
+            c.root = self.root.clone()
         return c
 
     def __add__(self, b):
