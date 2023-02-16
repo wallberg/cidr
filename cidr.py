@@ -8,11 +8,11 @@ cidrPattern = re.compile(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2
 class Cidr:
     """ Represent a single CIDR address as an integer IP part and the number of bits in the bitmask. """
 
-    def __init__(self, s=None):
+    def __init__(self, s=None, ip=0, bits=0):
 
         if s is None:
-            self.ip = 0
-            self.bits = 0
+            self.ip = ip
+            self.bits = bits
             return
 
         if (m := cidrPattern.match(s)) is None:
