@@ -270,6 +270,7 @@ class CidrSet:
             if node.left is None and node.right is None:
                 cidr = Cidr(ip=ip, bitmask=node.value)
                 yield cidr
+                return
 
             if node.left is not None:
                 yield from self.__iter__(node=node.left, ip=ip)
