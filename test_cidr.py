@@ -28,7 +28,7 @@ def test_cidr():
     with pytest.raises(ValueError, match=r"Invalid cidr octet format"):
         c = Cidr("255.255.255.256")
 
-    with pytest.raises(ValueError, match=r"Invalid cidr bits"):
+    with pytest.raises(ValueError, match=r"Invalid cidr bitmask"):
         c = Cidr("0.0.0.0/33")
 
 

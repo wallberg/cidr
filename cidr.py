@@ -8,11 +8,11 @@ cidrPattern = re.compile(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2
 class Cidr:
     """ Represent a single CIDR address as an integer IP part and the number of bits in the bitmask. """
 
-    def __init__(self, s=None, ip=0, bits=0):
+    def __init__(self, s=None, ip=0, bitmask=0):
 
         if s is None:
             self.ip = ip
-            self.bits = bits
+            self.bitmask = bitmask
             return
 
         if (m := cidrPattern.match(s)) is None:
@@ -28,14 +28,14 @@ class Cidr:
             self.ip += octet
 
         # Extract the optional length of the bitmask
-        self.bits = 32
+        self.bitmask = 32
         if m[6]:
-            self.bits = int(m[6])
-            if self.bits < 0 or self.bits > 32:
-                raise ValueError("Invalid cidr bits (0-32): {self.bits}")
+            self.bitmask = int(m[6])
+            if self.bitmask < 0 or self.bitmask > 32:
+                raise ValueError("Invalid cidr bitmask (0-32): {self.bitmask}")
 
         # Normalize the IP by zeroing out the bits not covered by the bitmask
-        self.ip = (self.ip >> (32-self.bits)) << (32-self.bits)
+        self.ip = (self.ip >> (32-self.bitmask)) << (32-self.bitmask)
 
     def bit(self, n):
         """ n-th bit in this cidr (1-32). """
@@ -47,13 +47,13 @@ class Cidr:
             self.ip >> 16 & 255,
             self.ip >> 8 & 255,
             self.ip & 255,
-            self.bits)
+            self.bitmask)
 
     def __rep__(self):
         return str(self)
 
     def __eq__(self, b):
-        return self.ip == b.ip and self.bits == b.bits
+        return self.ip == b.ip and self.bitmask == b.bitmask
 
 
 class CidrSet:
@@ -85,7 +85,7 @@ class CidrSet:
             return True
 
         # Base case, we've reached the bottom of the cidr, but not a leaf node
-        if cidr.bits == node.value:
+        if cidr.bitmask == node.value:
             return False
 
         # Get depth and bit for the child node
@@ -118,7 +118,7 @@ class CidrSet:
 
         # Base case, we've added a node for every bit, no more children
         # Existing children can be deleted
-        if cidr.bits == node.value:
+        if cidr.bitmask == node.value:
             node.left = None
             node.right = None
             return
@@ -199,7 +199,7 @@ class CidrSet:
 
         # Base case, we've reached the bottom of the cidr; perfect match
         # so delete this node and any descendants
-        if cidr.bits == node.value:
+        if cidr.bitmask == node.value:
             return True
 
         # Get depth and bit for the child node
