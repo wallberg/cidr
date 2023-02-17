@@ -320,6 +320,13 @@ def test_cidrset_sub():
     assert [str(cidr) for cidr in s.cidrs()] == [
     ]
 
+    s = CidrSet()
+    s.add(Cidr("0.0.0.0/32"))
+    s.sub(Cidr("0.0.0.2/32"))
+    assert [str(cidr) for cidr in s.cidrs()] == [
+        "0.0.0.0/32",
+    ]
+
 
 def test_cidrset_addoperator():
     a = CidrSet()

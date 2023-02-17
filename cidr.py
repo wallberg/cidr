@@ -208,29 +208,35 @@ class CidrSet:
 
         if bit == 0:
             if node.left is None:
-                node.left = Node(depth)
                 if node.right is None:
                     # Leaf node, trigger expansion
+                    node.left = Node(depth)
                     node.right = Node(depth)
+                else:
+                    # cidr is not in this set
+                    return False
 
             if self._sub(node.left, cidr):
+                node.left = None
                 if node.right is None:
                     # Now a leaf node, propogate the delete upward
                     return True
-                node.left = None
 
         else:
             if node.right is None:
-                node.right = Node(depth)
                 if node.left is None:
                     # Leaf node, trigger expansion
                     node.left = Node(depth)
+                    node.right = Node(depth)
+                else:
+                    # cidr is not in this set
+                    return False
 
             if self._sub(node.right, cidr):
+                node.right = None
                 if node.left is None:
                     # Now a leaf node, propogate the delete upward
                     return True
-                node.right = None
 
         return False
 
