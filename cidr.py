@@ -168,7 +168,7 @@ class CidrSet:
             raise ValueException("Second operand is not of type CidrSet")
 
         c = self.clone()
-        for cidr in b.cidrs():
+        for cidr in b:
             c.add(cidr)
         return c
 
@@ -178,7 +178,7 @@ class CidrSet:
             raise ValueException("Second operand is not of type CidrSet")
 
         c = self.clone()
-        for cidr in b.cidrs():
+        for cidr in b:
             c.sub(cidr)
         return c
 
@@ -251,34 +251,29 @@ class CidrSet:
 
         return self.root.leaf_count
 
-    def cidrs(self) -> list:
-        """ Output this set as a list of Cidr values. """
-
-        result = []
-        if self.root is not None:
-            self._cidrs(self.root, 0, result)
-
-        return result
-
-    def _cidrs(self, node, ip, result):
-        """ Traverse the tree, adding all Cidr values to the list. """
-
-        # Base case, leaf node so add the Cidr
-        if node.left is None and node.right is None:
-            cidr = Cidr()
-            cidr.ip = ip
-            cidr.bits = node.value
-            result.append(cidr)
-            return
-
-        if node.left is not None:
-            self._cidrs(node.left, ip, result)
-
-        if node.right is not None:
-            self._cidrs(node.right, ip + 2**(32-node.right.value), result)
-
     def __str__(self):
-        return ", ".join([str(cidr) for cidr in self.cidrs()])
+        return ", ".join([str(cidr) for cidr in self])
 
     def __rep__(self):
         return self.__str__()
+
+    def __iter__(self, node=None, ip=None):
+        """ Return an iterator over Cidr values in this set. """
+
+        if node is None:
+            if self.root is None:
+                return
+            yield from self.__iter__(node=self.root, ip=0)
+
+        else:
+            # Base case, leaf node so yield the Cidr
+            if node.left is None and node.right is None:
+                cidr = Cidr(ip=ip, bitmask=node.value)
+                yield cidr
+
+            if node.left is not None:
+                yield from self.__iter__(node=node.left, ip=ip)
+
+            if node.right is not None:
+                ip += 2**(32-node.right.value)
+                yield from self.__iter__(node=node.right, ip=ip)
