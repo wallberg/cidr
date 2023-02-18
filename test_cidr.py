@@ -22,6 +22,12 @@ def test_cidr():
     c = Cidr("255.0.0.0")
     assert str(c) == "255.0.0.0/32"
 
+    c = Cidr(ip=511, bitmask=1)
+    assert str(c) == "0.0.0.0/1"
+
+    c = Cidr(ip=511, bitmask=32)
+    assert str(c) == "0.0.1.255/32"
+
     with pytest.raises(ValueError, match=r"Invalid cidr format"):
         c = Cidr("255")
 

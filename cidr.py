@@ -22,26 +22,25 @@ class Cidr:
             if type(ip) != int or bitmask < 0 or bitmask > 32:
                 raise ValueError(f'Invalid bitmask: {bitmask}')
 
-            return
+        else:
+            if (m := cidrPattern.match(s)) is None:
+                raise ValueError(f'Invalid cidr format: {s}')
 
-        if (m := cidrPattern.match(s)) is None:
-            raise ValueError(f'Invalid cidr format: {s}')
+            # Extract the IP address
+            self.ip = 0
+            for i in (1, 2, 3, 4):
+                octet = int(m[i])
+                if octet < 0 or octet > 255:
+                    raise ValueError(f'Invalid cidr octet format: {octet}')
+                self.ip *= 256
+                self.ip += octet
 
-        # Extract the IP address
-        self.ip = 0
-        for i in (1, 2, 3, 4):
-            octet = int(m[i])
-            if octet < 0 or octet > 255:
-                raise ValueError(f'Invalid cidr octet format: {octet}')
-            self.ip *= 256
-            self.ip += octet
-
-        # Extract the optional length of the bitmask
-        self.bitmask = 32
-        if m[6]:
-            self.bitmask = int(m[6])
-            if self.bitmask < 0 or self.bitmask > 32:
-                raise ValueError("Invalid cidr bitmask (0-32): {self.bitmask}")
+            # Extract the optional length of the bitmask
+            self.bitmask = 32
+            if m[6]:
+                self.bitmask = int(m[6])
+                if self.bitmask < 0 or self.bitmask > 32:
+                    raise ValueError("Invalid cidr bitmask (0-32): {self.bitmask}")
 
         # Normalize the IP by zeroing out the bits not covered by the bitmask
         self.ip = (self.ip >> (32-self.bitmask)) << (32-self.bitmask)
