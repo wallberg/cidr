@@ -31,6 +31,15 @@ def test_cidr():
     with pytest.raises(ValueError, match=r"Invalid cidr bitmask"):
         c = Cidr("0.0.0.0/33")
 
+    with pytest.raises(ValueError, match=r"Must provide parameter"):
+        c = Cidr()
+
+    with pytest.raises(ValueError, match=r"Invalid ip"):
+        c = Cidr(ip=-1, bitmask=0)
+
+    with pytest.raises(ValueError, match=r"Invalid bitmask"):
+        c = Cidr(ip=0, bitmask=33)
+
 
 def test_cidr_bit():
     c = Cidr("0.0.0.0/0")
