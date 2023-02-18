@@ -195,21 +195,21 @@ class CidrSet:
 
         c = self.clone()
         for cidr in b:
-            c.sub(cidr)
+            c.remove(cidr)
         return c
 
-    def sub(self, cidr: Cidr):
-        """ Subtract a cidr to the set. """
+    def remove(self, cidr: Cidr):
+        """ Remove a Cidr node from the set. """
 
         if self.root is None:
             # Set is already empty
             return
 
-        if self._sub(self.root, cidr):
+        if self._remove(self.root, cidr):
             self.root = None
 
-    def _sub(self, node, cidr):
-        """ Recursively subtract a CIDR node from the set.
+    def _remove(self, node, cidr):
+        """ Recursively remove a Cidr node from the set.
         Returns True if this node should be removed.
         """
 
@@ -232,7 +232,7 @@ class CidrSet:
                     # cidr is not in this set
                     return False
 
-            if self._sub(node.left, cidr):
+            if self._remove(node.left, cidr):
                 node.left = None
                 if node.right is None:
                     # Now a leaf node, propogate the delete upward
@@ -248,7 +248,7 @@ class CidrSet:
                     # cidr is not in this set
                     return False
 
-            if self._sub(node.right, cidr):
+            if self._remove(node.right, cidr):
                 node.right = None
                 if node.left is None:
                     # Now a leaf node, propogate the delete upward

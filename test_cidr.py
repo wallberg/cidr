@@ -133,7 +133,7 @@ def test_cidrset_clone():
         "0.0.0.0/31",
     ]
 
-    a.sub(Cidr("0.0.0.1/32"))
+    a.remove(Cidr("0.0.0.1/32"))
     b.add(Cidr("0.0.0.0/30"))
     assert [str(cidr) for cidr in a] == [
         "0.0.0.0/32",
@@ -246,21 +246,21 @@ def test_cidrset_add():
     ]
 
 
-def test_cidrset_sub():
+def test_cidrset_remove():
     s = CidrSet()
 
     s.add(Cidr("0.0.0.0/0"))
-    s.sub(Cidr("0.0.0.0/0"))
+    s.remove(Cidr("0.0.0.0/0"))
     assert [str(cidr) for cidr in s] == [
     ]
 
     s.add(Cidr("0.0.0.0/0"))
-    s.sub(Cidr("255.0.0.0/1"))
+    s.remove(Cidr("255.0.0.0/1"))
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/1",
     ]
 
-    s.sub(Cidr("0.0.0.0/32"))
+    s.remove(Cidr("0.0.0.0/32"))
     assert [str(cidr) for cidr in s] == [
         "0.0.0.1/32",
         "0.0.0.2/31",
@@ -295,14 +295,14 @@ def test_cidrset_sub():
         "64.0.0.0/2",
     ]
 
-    s.sub(Cidr("0.0.0.0/4"))
+    s.remove(Cidr("0.0.0.0/4"))
     assert [str(cidr) for cidr in s] == [
         "16.0.0.0/4",
         "32.0.0.0/3",
         "64.0.0.0/2",
     ]
 
-    s.sub(Cidr("0.0.0.0/0"))
+    s.remove(Cidr("0.0.0.0/0"))
     assert [str(cidr) for cidr in s] == [
     ]
 
@@ -313,12 +313,12 @@ def test_cidrset_sub():
         "64.0.0.0/3",
     ]
 
-    s.sub(Cidr("0.0.0.0/3"))
+    s.remove(Cidr("0.0.0.0/3"))
     assert [str(cidr) for cidr in s] == [
         "64.0.0.0/3",
     ]
 
-    s.sub(Cidr("64.0.0.0/2"))
+    s.remove(Cidr("64.0.0.0/2"))
     assert [str(cidr) for cidr in s] == [
     ]
 
@@ -329,18 +329,18 @@ def test_cidrset_sub():
         "255.255.255.255/32",
     ]
 
-    s.sub(Cidr("255.255.255.255/32"))
+    s.remove(Cidr("255.255.255.255/32"))
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/32",
     ]
 
-    s.sub(Cidr("0.0.0.0/32"))
+    s.remove(Cidr("0.0.0.0/32"))
     assert [str(cidr) for cidr in s] == [
     ]
 
     s = CidrSet()
     s.add(Cidr("0.0.0.0/32"))
-    s.sub(Cidr("0.0.0.2/32"))
+    s.remove(Cidr("0.0.0.2/32"))
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/32",
     ]
