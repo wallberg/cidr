@@ -79,22 +79,19 @@ class CidrSet:
         for arg in args:
             self.add(arg)
 
-    def __contains__(self, cidr):
-        """ Add support for the 'in' operator. """
+    def contains(self, cidr):
+        """ Test if this cidr is in the set, ie every IP in the cidr is in the set. """
+
         if type(cidr) is not Cidr:
             return False
 
-        return self.contains(cidr)
-
-    def contains(self, cidr):
-        """ Test if this cidr is in the set, ie every IP in the cidr is in the set. """
         if self.root is None:
             return False
 
         return self._contains(self.root, cidr)
 
     def _contains(self, node, cidr):
-        """ Recursively test if this cidr is in the set. """
+        """ Recursively test if this Cidr node is in the set. """
 
         # Base case, we've reached a leaf node
         if node.left is None and node.right is None:
@@ -116,6 +113,8 @@ class CidrSet:
             if node.right is None:
                 return False
             return self._contains(node.right, cidr)
+
+    __contains__ = contains
 
     def add(self, cidr):
         """ Add a new cidr to the set. """
