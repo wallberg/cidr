@@ -68,9 +68,16 @@ class Cidr:
 class CidrSet:
     """ Represent a set of CIDR ranges as a binary tree. """
 
-    def __init__(self):
+    def __init__(self, *args):
         # Start empty
         self.root = None
+
+        self.extend(args)
+
+    def extend(self, args):
+        """ Add several items at once. """
+        for arg in args:
+            self.add(arg)
 
     def __contains__(self, cidr):
         """ Add support for the 'in' operator. """

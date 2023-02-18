@@ -75,6 +75,15 @@ def test_cidrset():
     s.add(Cidr("0.0.0.0/1"))
     assert s.root is not None
 
+    s = CidrSet(Cidr("0.0.0.0/32"), Cidr("255.255.255.255/32"))
+    assert s.size() == 2
+
+
+def test_cidrset_extend():
+    s = CidrSet()
+    s.extend([Cidr("0.0.0.0/32"), Cidr("255.255.255.255/32")])
+    assert s.size() == 2
+
 
 def test_cidrset_contains():
     s = CidrSet()
