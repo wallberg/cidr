@@ -60,11 +60,11 @@ The CidrSet is implemented internally as a directed, binary tree. The depth of t
 
 ![Figure 1](doc/fig1.svg) Figure 1
 
-If we add "192.0.0.0/2" to the set then the set could look like Figure 2.
+If we add "192.0.0.0/2" to the set it could look like Figure 2.
 
 ![Figure 2](doc/fig2.svg) Figure 2
 
-However "128.0.0.0/2" and "192.0.0.0/2" in the set means that bit 1 has a value of 0 and bit 2 could be 0 or 1, as can all bits 3-32.  Therefore those two nodes will collapse to "128.0.0.0/1".  But, "0.0.0.0/1" and "128.0.0.0/1" in the set means that bit 1 can be 0 or 1, as can all bits 2-32.  So those two nodes can also collapse, to "0.0.0.0/0".
+However, "128.0.0.0/2" and "192.0.0.0/2" in the set means that bit 1 has a value of 0 and bit 2 could be 0 or 1, as can all bits 3-32.  Therefore, those two nodes will collapse to "128.0.0.0/1".  But "0.0.0.0/1" and "128.0.0.0/1" in the set means that bit 1 can be 0 or 1, as can all bits 2-32.  So those two nodes can also collapse, to "0.0.0.0/0".
 
 ![Figure 3](doc/fig3.svg) Figure 3
 
