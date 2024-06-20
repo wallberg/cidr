@@ -179,7 +179,7 @@ class CidrSet:
     def __add__(self, b):
         """ Support the addition operator, for two CidrSet objects. """
         if type(b) is not CidrSet:
-            raise ValueException("Second operand is not of type CidrSet")
+            raise ValueError("Second operand is not of type CidrSet")
 
         c = self.clone()
         for cidr in b:
@@ -189,7 +189,7 @@ class CidrSet:
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """
         if type(b) is not CidrSet:
-            raise ValueException("Second operand is not of type CidrSet")
+            raise ValueError("Second operand is not of type CidrSet")
 
         c = self.clone()
         for cidr in b:
