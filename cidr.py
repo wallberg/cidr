@@ -15,11 +15,11 @@ class Cidr:
                 raise ValueError('Must provide parameter: s or (ip and bitmask)')
 
             self.ip = ip
-            if type(ip) != int or ip < 0 or ip >= 2**32:
+            if not isinstance(ip, int) or ip < 0 or ip >= 2**32:
                 raise ValueError(f'Invalid ip: {ip}')
 
             self.bitmask = bitmask
-            if type(ip) != int or bitmask < 0 or bitmask > 32:
+            if not isinstance(ip, int) or bitmask < 0 or bitmask > 32:
                 raise ValueError(f'Invalid bitmask: {bitmask}')
 
         else:
