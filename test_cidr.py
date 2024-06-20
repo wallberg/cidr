@@ -1,4 +1,5 @@
 import pytest
+from random import seed, randint, triangular
 
 from .cidr import Cidr, CidrSet
 
@@ -439,3 +440,70 @@ def test_cidrset_iter():
         "0.0.0.0/2",
         "128.0.0.0/1",
     ]
+
+
+def test_cidrset_ops():
+    """ Compare results of add/remove ops vs __add__/__sub__ ops. """
+
+    a = CidrSet()
+    b = CidrSet()
+
+    def test_add():
+        x = a + b
+        y = a.clone()
+        for cidr in b:
+            y.add(cidr)
+        assert x == y
+
+    def test_sub():
+        x = a - b
+        y = a.clone()
+        for cidr in b:
+            y.remove(cidr)
+        assert x == y
+
+    def test_both():
+        test_add()
+        test_sub()
+
+    a.add(Cidr("0.0.0.0/32"))
+    test_both()
+
+    a.add(Cidr("0.0.0.1/32"))
+    test_both()
+
+    b.add(Cidr("0.0.0.0/32"))
+    test_both()
+
+    # Randomly add and remove Cidr values
+    seed(0)
+    for i in range(100):
+        cidr = Cidr(
+            ip = randint(0,255) * 256**3 + randint(0,255) * 256**2 + randint(0,255) * 256**1 + randint(0,255) * 256**0,
+            bitmask = int(triangular(8,33,33))
+        )
+
+        if randint(0,1) == 0:
+            a.add(cidr)
+        else:
+            b.add(cidr)
+
+        test_both()
+
+    # Add everything in a to b
+    c = b.clone()
+    for cidr in a:
+        b.add(cidr)
+        test_both()
+
+    # Test node expand and collapse
+    b = c.clone()
+    for cidr in a:
+        # Flip the final bit
+        cidr_new = Cidr(
+            ip = cidr.ip ^ 2**(32-cidr.bitmask),
+            bitmask = cidr.bitmask,
+        )
+        b.add(cidr_new)
+        test_both()
+
