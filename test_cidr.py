@@ -425,7 +425,7 @@ def test_cidrset_eq():
     assert a != b
 
 
-def test_iter():
+def test_cidrset_iter():
     s = CidrSet()
     assert len(list(s)) == 0
 
