@@ -406,6 +406,25 @@ def test_cidrset_suboperator():
     assert len(s) == 0
 
 
+def test_cidrset_eq():
+    a = CidrSet()
+
+    with pytest.raises(ValueError):
+        a == 1
+
+    b = CidrSet()
+    assert a == b
+
+    a.add(Cidr("0.0.0.0/0"))
+    assert a != b
+
+    b.add(Cidr("0.0.0.0/0"))
+    assert a == b
+
+    b.remove(Cidr("128.0.0.0/1"))
+    assert a != b
+
+
 def test_iter():
     s = CidrSet()
     assert len(list(s)) == 0

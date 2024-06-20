@@ -271,6 +271,19 @@ class CidrSet:
     def __rep__(self):
         return self.__str__()
 
+    def __eq__(self, b):
+        if type(b) is not CidrSet:
+            raise ValueError("Second operand is not of type CidrSet")
+
+        if self.root is None and b.root is None:
+            return True
+
+        elif self.root is not None and b.root is not None:
+            return self.root.equals(b.root)
+
+        else:
+            return False
+
     def __iter__(self, node=None, ip=None):
         """ Return an iterator over Cidr values in this set. """
 
