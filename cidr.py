@@ -181,10 +181,48 @@ class CidrSet:
         if type(b) is not CidrSet:
             raise ValueError("Second operand is not of type CidrSet")
 
-        c = self.clone()
-        for cidr in b:
-            c.add(cidr)
-        return c
+        if self.size() == 0:
+            return b.clone()
+
+        a = self.clone()
+        if b.size() == 0:
+            return a
+
+        # Add the contents of b to a
+
+        # Stack initialization
+        # a_stack = [a.root] + [None] * 32
+
+        b_stack = [None] * 33
+        # b_state = [0] * 33  # 0 - Left, 1 - Right, 2 - Done
+
+        b_current = b.root
+
+        # Traverse tree b, adding to tree a as necessary
+        # Courtesy https://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion/
+        while True:
+
+            # Reach the left most Node of the current Node
+            if b_current is not None:
+
+                # Place pointer to a tree node on the stack
+                # before traversing the node's left subtree
+                b_stack.append(b_current)
+                b_current = b_current.left
+
+            # BackTrack from the empty subtree and visit the Node
+            # at the top of the stack; however, if the stack is 
+            # empty you are done
+            elif(b_stack):
+                b_current = b_stack.pop()
+                print(b_current.value, end=" ")
+
+                # We have visited the node and its left
+                # subtree. Now, it's right subtree's turn
+                b_current = b_current.right
+
+            else:
+                break
 
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """

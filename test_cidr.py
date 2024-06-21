@@ -355,6 +355,10 @@ def test_cidrset_remove():
 
 def test_cidrset_addoperator():
     a = CidrSet()
+
+    with pytest.raises(ValueError):
+        a == 1
+
     b = CidrSet()
     s = a + b
     assert type(s) is CidrSet
@@ -377,6 +381,13 @@ def test_cidrset_addoperator():
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/32",
         "255.255.255.255/32",
+    ]
+
+    b.add(Cidr("255.255.255.254"))
+    s = a + b
+    assert [str(cidr) for cidr in s] == [
+        "0.0.0.0/32",
+        "255.255.255.254/31",
     ]
 
 
