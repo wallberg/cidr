@@ -188,19 +188,17 @@ class CidrSet:
         if b.size() == 0:
             return a
 
-        # Add the contents of b to a
-
-        # Stack initialization
-        # a_stack = [a.root] + [None] * 32
-
-        # b_state = [0] * 33  # 0 - Left, 1 - Right, 2 - Done
-
         # Traverse b in postorder (TAOCP, §2.3.1, Algorithm T, Exercise 13)
+        # Simultaneously traverse a, making changes as necessary
 
         # T1 [Initialize]
-        b_stack = []
-        b_p = b.root
-        b_q = None
+        b_stack = []  # b, node stack
+        b_p = b.root # b, current node
+        b_q = None # b, last node visited
+
+        a_stack = []  # a, node stack
+        a_p = a.root # a, current node
+        # a_q = None # a, last node visited
 
         goto = 'T2'
         while True:
@@ -211,6 +209,12 @@ class CidrSet:
             if goto == 'T3':  # [Stack ⇐ P.]
                 b_stack.append(b_p)
                 b_p = b_p.left
+
+                a_stack.append(a_p)
+                if a_p.left is None and b_p is not None:
+                    a_p.left = Node(a_p.value+1)
+                a_p = a_p.left
+
                 goto = 'T2'
 
             if goto == 'T4':  # [P ⇐ Stack.]
@@ -218,6 +222,7 @@ class CidrSet:
                     print()
                     return a
                 b_p = b_stack.pop()
+                a_p = a_stack.pop()
                 goto = 'T5'
 
             if goto == 'T5':  # [Right branch done?]
@@ -226,6 +231,12 @@ class CidrSet:
                 else:
                     b_stack.append(b_p)
                     b_p = b_p.right
+
+                    a_stack.append(a_p)
+                    if a_p.right is None and b_p is not None:
+                        a_p.right = Node(a_p.value+1)
+                    a_p = a_p.right
+
                     goto = 'T2'
 
             if goto == 'T6':  # [Visit P.]
