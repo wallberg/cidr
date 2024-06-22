@@ -376,14 +376,14 @@ def test_cidrset_addoperator():
         "0.0.0.0/32",
     ]
 
-    a.add(Cidr("255.255.255.255"))
+    b.add(Cidr("255.255.255.255"))
     s = a + b
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/32",
         "255.255.255.255/32",
     ]
 
-    b.add(Cidr("255.255.255.254"))
+    a.add(Cidr("255.255.255.254"))
     s = a + b
     assert [str(cidr) for cidr in s] == [
         "0.0.0.0/32",

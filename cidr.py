@@ -193,36 +193,36 @@ class CidrSet:
         # Stack initialization
         # a_stack = [a.root] + [None] * 32
 
-        b_stack = [None] * 33
         # b_state = [0] * 33  # 0 - Left, 1 - Right, 2 - Done
 
-        b_current = b.root
+        # Traverse b in preorder (TAOCP, §2.3.1, Algorithm T)
 
-        # Traverse tree b, adding to tree a as necessary
-        # Courtesy https://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion/
+        # T1 [Initialize]
+        b_stack = []
+        b_p = b.root
+
+        goto = 'T2'
         while True:
 
-            # Reach the left most Node of the current Node
-            if b_current is not None:
+            if goto == 'T2':  # [P = Λ?]
+                goto = 'T4' if b_p is None else 'T3'
 
-                # Place pointer to a tree node on the stack
-                # before traversing the node's left subtree
-                b_stack.append(b_current)
-                b_current = b_current.left
+            if goto == 'T3':  # [Stack ⇐ P.]
+                b_stack.append(b_p)
+                b_p = b_p.left
+                goto = 'T2'
 
-            # BackTrack from the empty subtree and visit the Node
-            # at the top of the stack; however, if the stack is 
-            # empty you are done
-            elif(b_stack):
-                b_current = b_stack.pop()
-                print(b_current.value, end=" ")
+            if goto == 'T4':  # [P ⇐ Stack.]
+                if len(b_stack) == 0:
+                    print()
+                    return a
+                b_p = b_stack.pop()
+                goto = 'T5'
 
-                # We have visited the node and its left
-                # subtree. Now, it's right subtree's turn
-                b_current = b_current.right
-
-            else:
-                break
+            if goto == 'T5':  # [Visit P.]
+                print(b_p.value, end=" ")
+                b_p = b_p.right
+                goto = 'T2'
 
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """
