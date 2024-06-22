@@ -195,11 +195,12 @@ class CidrSet:
 
         # b_state = [0] * 33  # 0 - Left, 1 - Right, 2 - Done
 
-        # Traverse b in preorder (TAOCP, §2.3.1, Algorithm T)
+        # Traverse b in postorder (TAOCP, §2.3.1, Algorithm T, Exercise 13)
 
         # T1 [Initialize]
         b_stack = []
         b_p = b.root
+        b_q = None
 
         goto = 'T2'
         while True:
@@ -219,10 +220,18 @@ class CidrSet:
                 b_p = b_stack.pop()
                 goto = 'T5'
 
-            if goto == 'T5':  # [Visit P.]
+            if goto == 'T5':  # [Right branch done?]
+                if b_p.right is None or b_p.right == b_q:
+                    goto = 'T6'
+                else:
+                    b_stack.append(b_p)
+                    b_p = b_p.right
+                    goto = 'T2'
+
+            if goto == 'T6':  # [Visit P.]
                 print(b_p.value, end=" ")
-                b_p = b_p.right
-                goto = 'T2'
+                b_q = b_p
+                goto = 'T4'
 
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """
