@@ -213,9 +213,11 @@ class CidrSet:
                 b_is_leaf = b_p.left is None and b_p.right is None
                 a_is_leaf = a_p.left is None and a_p.right is None
 
-                if b_is_leaf != a_is_leaf:  # xor
+                if b_is_leaf ^ a_is_leaf:
+                    # If node a is a leaf, then whatever is below node b is
+                    # already included, so we can skip them.
                     if b_is_leaf:
-                        # Turn node a into a leaf, to match b
+                        # Node b is a leaf, so turn node a into a leaf also
                         a.left = None
                         a.right = None
 
