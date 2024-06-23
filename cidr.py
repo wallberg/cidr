@@ -213,20 +213,22 @@ class CidrSet:
                 b_is_leaf = b_p.left is None and b_p.right is None
                 a_is_leaf = a_p.left is None and a_p.right is None
 
-                if b_is_leaf and not a_is_leaf:
-                    a.left = None
-                    a.right = None
-                    b_p = b_p.left
-                    a_p = a_p.left
+                if b_is_leaf != a_is_leaf:  # xor
+                    if b_is_leaf:
+                        # Turn node a into a leaf, to match b
+                        a.left = None
+                        a.right = None
 
-                elif a_is_leaf and not b_is_leaf:
-                    # Skip processing b.left
+                    # Skip left traversal
                     b_p = None
                     a_p = None
 
                 else:
                     if a_p.left is None and b_p.left is not None:
+                        # Add left node to node a, to match node b left node
                         a_p.left = Node(a_p.value+1)
+
+                    # Traverse left
                     b_p = b_p.left
                     a_p = a_p.left
 
@@ -242,6 +244,7 @@ class CidrSet:
 
             if goto == 'T5':  # [Right branch done?]
                 if b_p.right is None or b_p.right == b_q:
+                    # Right traversal is not necessary or already done
                     goto = 'T6'
                 else:
                     b_stack.append(b_p)
