@@ -390,6 +390,19 @@ def test_cidrset_addoperator():
         "255.255.255.254/31",
     ]
 
+    a = CidrSet(Cidr("0.0.0.0/31"))
+    b = CidrSet(Cidr("0.0.0.0/32"))
+    s = a + b
+    assert [str(cidr) for cidr in s] == [
+        "0.0.0.0/31",
+    ]
+
+    a = CidrSet(Cidr("0.0.0.0/32"))
+    b = CidrSet(Cidr("0.0.0.0/31"))
+    s = a + b
+    assert [str(cidr) for cidr in s] == [
+        "0.0.0.0/32",
+    ]
 
 def test_cidrset_suboperator():
     a = CidrSet()

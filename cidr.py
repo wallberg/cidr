@@ -189,16 +189,16 @@ class CidrSet:
             return a
 
         # Traverse b in postorder (TAOCP, §2.3.1, Algorithm T, Exercise 13)
-        # Simultaneously traverse a, making changes as necessary
+        # Simultaneously traverse a in the same order as b, making changes
+        # to a as necessary
 
         # T1 [Initialize]
-        b_stack = []  # b, node stack
-        b_p = b.root # b, current node
-        b_q = None # b, last node visited
+        b_stack = []  # b tree, node stack
+        b_p = b.root # b tree, current node
+        b_q = None # b tree, last node visited
 
-        a_stack = []  # a, node stack
-        a_p = a.root # a, current node
-        # a_q = None # a, last node visited
+        a_stack = []  # a tree, node stack
+        a_p = a.root # a tree, current node
 
         goto = 'T2'
         while True:
@@ -208,19 +208,34 @@ class CidrSet:
 
             if goto == 'T3':  # [Stack ⇐ P.]
                 b_stack.append(b_p)
-                b_p = b_p.left
-
                 a_stack.append(a_p)
-                if a_p.left is None and b_p is not None:
-                    a_p.left = Node(a_p.value+1)
-                a_p = a_p.left
+
+                b_is_leaf = b_p.left is None and b_p.right is None
+                a_is_leaf = a_p.left is None and a_p.right is None
+
+                if b_is_leaf and not a_is_leaf:
+                    a.left = None
+                    a.right = None
+                    b_p = b_p.left
+                    a_p = a_p.left
+
+                elif a_is_leaf and not b_is_leaf:
+                    # Skip processing b.left
+                    b_p = None
+                    a_p = None
+
+                else:
+                    if a_p.left is None and b_p.left is not None:
+                        a_p.left = Node(a_p.value+1)
+                    b_p = b_p.left
+                    a_p = a_p.left
 
                 goto = 'T2'
 
             if goto == 'T4':  # [P ⇐ Stack.]
                 if len(b_stack) == 0:
-                    print()
                     return a
+
                 b_p = b_stack.pop()
                 a_p = a_stack.pop()
                 goto = 'T5'
@@ -240,7 +255,13 @@ class CidrSet:
                     goto = 'T2'
 
             if goto == 'T6':  # [Visit P.]
-                print(b_p.value, end=" ")
+                # Check if a collapse is necessary because both child nodes are leaf nodes
+                if (a_p.left is not None and a_p.right is not None
+                    and a_p.left.left is None and a_p.left.right is None
+                    and a_p.right.left is None and a_p.right.right is None):
+                    a_p.left = None
+                    a_p.right =  None
+
                 b_q = b_p
                 goto = 'T4'
 
