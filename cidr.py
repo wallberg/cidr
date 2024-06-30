@@ -303,13 +303,126 @@ class CidrSet:
 
     def __sub__(self, b):
         """ Support the subtraction operator, for two CidrSet objects. """
+
         if type(b) is not CidrSet:
             raise ValueError("Second operand is not of type CidrSet")
 
-        c = self.clone()
-        for cidr in b:
-            c.remove(cidr)
-        return c
+        a = self.clone()
+        if self.size() == 0 or b.size() == 0:
+            return a
+
+        # Traverse b in postorder (TAOCP, §2.3.1, Algorithm T, Exercise 13)
+        # Simultaneously traverse a in the same order as b, making changes
+        # to a as necessary
+
+        # T1 [Initialize]
+        b_stack = []  # b tree, node stack
+        b_p = b.root # b tree, current node
+        b_q = None # b tree, last node visited
+
+        a_stack = []  # a tree, node stack
+        a_p = a.root # a tree, current node
+        a_created = None # a tree, most recently created a node
+
+        goto = 'T2'
+        while True:
+
+            if goto == 'T2':  # [P = Λ?]
+                goto = 'T4' if b_p is None else 'T3'
+                # print(f"T2: {goto=}")
+
+            if goto == 'T3':  # [Stack ⇐ P.]
+                # print("T3: push")
+                b_stack.append(b_p)
+                a_stack.append(a_p)
+
+                b_is_leaf = b_p.left is None and b_p.right is None
+                a_is_leaf = a_p != a_created and a_p.left is None and a_p.right is None
+
+                # print(f"T2: {a_is_leaf=}, {b_is_leaf=}, {(a_p == a_created)=}")
+                if b_is_leaf ^ a_is_leaf:
+                    print("here A")
+                    # If node a is a leaf, then whatever is below node b is
+                    # already included, so we can skip them.
+                    if b_is_leaf:
+                        # Node b is a leaf, so turn node a into a leaf also
+                        a_p.left = None
+                        a_p.right = None
+
+                    # Skip left traversal
+                    b_p = None
+                    a_p = None
+
+                elif b_p.left is None:
+                    print("here B")
+                    # Skip left traversal
+                    b_p = None
+                    a_p = None
+
+                else:
+                    # print("here C")
+                    if a_p.left is None:
+                        # Add left node to node a, to match node b left node
+                        a_p.left = Node(a_p.value+1)
+                        a_created = a_p.left
+
+                    # Traverse left
+                    b_p = b_p.left
+                    a_p = a_p.left
+
+                # if b_p is not None:
+                #     print("T5: moved left")
+
+                goto = 'T2'
+
+            if goto == 'T4':  # [P ⇐ Stack.]
+                # print("T4: pop")
+
+                if len(b_stack) == 0:
+                    return a
+
+                b_p = b_stack.pop()
+                a_p = a_stack.pop()
+                # print(f"T4: {b_p.value=}, {a_p.value=}")
+
+                goto = 'T5'
+
+            if goto == 'T5':  # [Right branch done?]
+                a_is_leaf = a_p != a_created and a_p.left is None and a_p.right is None
+                # print(f"T5: {a_is_leaf=}, {b_is_leaf=}, {(a_p == a_created)=}")
+
+                if a_is_leaf or b_p.right is None or b_p.right == b_q:
+                    # print('T5: skip right')
+                    # Skip right traversal: it's not necessary or already done
+                    goto = 'T6'
+                else:
+                    b_stack.append(b_p)
+                    b_p = b_p.right
+
+                    a_stack.append(a_p)
+                    if a_p.right is None and b_p is not None:
+                        # print("T5: adding a_p.right node")
+                        a_p.right = Node(a_p.value+1)
+                        a_created = a_p.right
+                    a_p = a_p.right
+
+                    # if b_p is not None:
+                    #     print("T5: moved right")
+
+                    goto = 'T2'
+
+            if goto == 'T6':  # [Visit P.]
+                # print("T6: visit")
+                # Check if a collapse is necessary because both child nodes are leaf nodes
+                if (a_p.left is not None and a_p.right is not None
+                    and a_p.left.left is None and a_p.left.right is None
+                    and a_p.right.left is None and a_p.right.right is None):
+                    # print("T6: collapsing a node")
+                    a_p.left = None
+                    a_p.right =  None
+
+                b_q = b_p
+                goto = 'T4'
 
     def remove(self, cidr: Cidr):
         """ Remove a Cidr node from the set. """
