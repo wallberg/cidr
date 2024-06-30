@@ -214,7 +214,7 @@ class CidrSet:
                 a_stack.append(a_p)
 
                 b_is_leaf = b_p.left is None and b_p.right is None
-                a_is_leaf = a_p.left is None and a_p.right is None
+                a_is_leaf = a_p != a_created and a_p.left is None and a_p.right is None
 
                 if b_is_leaf ^ a_is_leaf:
                     print("here A")
