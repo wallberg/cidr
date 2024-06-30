@@ -56,7 +56,7 @@ assert [str(cidr) for cidr in c] == [
 
 ## Implementation
 
-The CidrSet is implemented internally as a directed, binary tree. The depth of the node is equal to the bitmask value of the Cidr, with the root node having a depth of 0, and the edges representing a bit value of 0 or 1. A node represents a Cidr if and only if it is a leaf node. See Figure 1 for a CidrSet containing "0.0.0.0/1" and "128.0.0.0/2". The complete sub-tree to depth 32 is implied by each leaf node.
+CidrSet is implemented as a binary [Trie](https://en.wikipedia.org/wiki/Trie) with the left edge implying a 0 bit and right edge a 1 bit. The depth of the node is equal to the bitmask value of the Cidr, with the root node having a depth of 0, and the edges representing a bit value of 0 or 1. A node represents a Cidr if and only if it is a leaf node. See Figure 1 for a CidrSet containing "0.0.0.0/1" and "128.0.0.0/2". The complete sub-tree to depth 32 is implied by each leaf node.
 
 ![Figure 1](doc/fig1.svg) Figure 1
 
