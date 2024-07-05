@@ -466,24 +466,56 @@ def test_cidrset_suboperator():
     assert [str(cidr) for cidr in s] == [
     ]
 
-    # b.add(Cidr("0.0.0.0"))
-    # s = a - b
-    # assert len(s) == 0
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("0.0.0.0/0"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+    ]
 
-    # b -= b
-    # assert len(b) == 0
+    a = CidrSet(Cidr("0.0.0.0/1"))
+    b = CidrSet(Cidr("0.0.0.0/0"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+    ]
 
-    # a.add(Cidr("0.0.0.0/0"))
-    # b.add(Cidr("0.0.0.0/2"))
-    # b.add(Cidr("255.255.255.255/2"))
-    # s = a - b
-    # assert [str(cidr) for cidr in s] == [
-    #     "64.0.0.0/2",
-    #     "128.0.0.0/2"
-    # ]
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("0.0.0.0/1"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+        "128.0.0.0/1",
+    ]
 
-    # s = a - b - a
-    # assert len(s) == 0
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("128.0.0.0/1"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+        "0.0.0.0/1",
+    ]
+
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("0.0.0.0/2"), Cidr("255.255.255.255/2"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+        "64.0.0.0/2",
+        "128.0.0.0/2"
+    ]
+
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("0.0.0.0/2"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+        "64.0.0.0/2",
+        "128.0.0.0/1"
+    ]
+
+    a = CidrSet(Cidr("0.0.0.0/0"))
+    b = CidrSet(Cidr("64.0.0.0/2"), Cidr("128.0.0.0/2"))
+    s = a - b
+    assert [str(cidr) for cidr in s] == [
+        "0.0.0.0/2",
+        "192.0.0.0/2"
+    ]
+
 
 
 def test_cidrset_eq():
@@ -554,7 +586,21 @@ def test_cidrset_ops():
         y = a.clone()
         for cidr in b:
             y.remove(cidr)
-        assert x == y
+        if x != y:
+            print(f"{i=}")
+            print(a.size())
+            for cidr in a:
+                print(f"a: {str(cidr)=}")
+            print(b.size())
+            for cidr in b:
+                print(f"b: {str(cidr)=}")
+            print(x.size())
+            for cidr in x:
+                print(f"x: {str(cidr)=}")
+            print(y.size())
+            for cidr in y:
+                print(f"y: {str(cidr)=}")
+            assert False
 
     def test_both():
         test_add()
