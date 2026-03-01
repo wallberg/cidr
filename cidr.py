@@ -63,6 +63,17 @@ class Cidr:
     def __eq__(self, b):
         return self.ip == b.ip and self.bitmask == b.bitmask
 
+    def __iter__(self):
+        """ Iterate over all individual IP addresses in this CIDR range. """
+        num_hosts = 2 ** (32 - self.bitmask)
+        for i in range(num_hosts):
+            ip_int = self.ip + i
+            yield '{}.{}.{}.{}'.format(
+                ip_int >> 24 & 255,
+                ip_int >> 16 & 255,
+                ip_int >> 8 & 255,
+                ip_int & 255)
+
 
 class CidrSet:
     """ Represent a set of CIDR ranges as a binary tree. """

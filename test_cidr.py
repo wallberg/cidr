@@ -75,6 +75,52 @@ def test_cidr_eq():
     assert a != b
 
 
+def test_cidr_iter():
+    c = Cidr("0.0.0.0/32")
+    ips = list(c)
+    assert len(ips) == 1
+    assert ips[0] == "0.0.0.0"
+
+    c = Cidr("255.255.255.255/32")
+    ips = list(c)
+    assert len(ips) == 1
+    assert ips[0] == "255.255.255.255"
+
+    c = Cidr("0.0.0.0/31")
+    ips = list(c)
+    assert len(ips) == 2
+    assert ips[0] == "0.0.0.0"
+    assert ips[1] == "0.0.0.1"
+
+    c = Cidr("255.255.255.254/31")
+    ips = list(c)
+    assert len(ips) == 2
+    assert ips[0] == "255.255.255.254"
+    assert ips[1] == "255.255.255.255"
+
+    c = Cidr("0.0.0.0/30")
+    ips = list(c)
+    assert len(ips) == 4
+    assert ips == ["0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.3"]
+
+    c = Cidr("192.168.1.0/30")
+    ips = list(c)
+    assert len(ips) == 4
+    assert ips == ["192.168.1.0", "192.168.1.1", "192.168.1.2", "192.168.1.3"]
+
+    c = Cidr("10.0.0.0/29")
+    ips = list(c)
+    assert len(ips) == 8
+    assert ips[0] == "10.0.0.0"
+    assert ips[-1] == "10.0.0.7"
+
+    c = Cidr("10.0.0.0/22")
+    ips = list(c)
+    assert len(ips) == 1024
+    assert ips[0] == "10.0.0.0"
+    assert ips[-1] == "10.0.3.255"
+
+
 def test_cidrset():
     s = CidrSet()
     assert s.root is None
