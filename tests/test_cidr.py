@@ -1,7 +1,7 @@
 import pytest
 from random import seed, randint, triangular
 
-from .cidr import Cidr, CidrSet
+from cidr import Cidr, CidrSet
 
 
 def test_cidr():

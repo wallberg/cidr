@@ -1,0 +1,27 @@
+[project]
+name = "cidr"
+version = "0.0.1"
+description = "Experimental library for storing and manipulating sets of CIDR format IP ranges."
+authors = [{ name = "Ben Wallberg", email = "wallberg@umd.edu" }]
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "binarytree==6.5.1",
+    # binarytree imports pkg_resources at runtime but doesn't declare setuptools
+    # as a dependency; setuptools>=81 dropped pkg_resources entirely.
+    "setuptools<81",
+]
+
+[project.urls]
+Homepage = "https://github.com/wallberg-umd/cidr"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pycodestyle==2.10.0"]
+test = ["pytest==7.2.1", "pytest-cov==2.12.1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

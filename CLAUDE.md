@@ -4,38 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Experimental Python library for storing and manipulating sets of CIDR-format IP ranges. The entire implementation lives in two files: `cidr.py` (library) and `test_cidr.py` (tests).
+Experimental Python library for storing and manipulating sets of CIDR-format IP ranges. Src-layout package: implementation lives in `src/cidr/` (`cidr.py`, re-exported by `__init__.py`), tests in `tests/test_cidr.py`.
 
 ## Commands
 
+Dependency/environment management is via `uv`; dev tasks are run through `Taskfile.yml` (go-task).
+
 Install for development:
 ```
-pip install -e .[dev,test]
+task sync
 ```
 
 Run tests:
 ```
-pytest
+task test
 ```
 
 Run a single test:
 ```
-pytest test_cidr.py::test_name
+uv run pytest tests/test_cidr.py::test_name
 ```
 
-Lint (style checks, max line length 120, config in `setup.cfg`):
+Lint (style checks, max line length 120):
 ```
-pycodestyle *.py
-```
-
-Run both tests and lint (as defined in `Makefile`):
-```
-make test
+task lint
 ```
 
 Regenerate the trie diagrams in `doc/` (requires Graphviz's `dot`, `gvpr`, and `neato`):
 ```
-make doc
+task doc
 ```
 
 ## Architecture
@@ -47,8 +44,8 @@ make doc
   - `__add__`/`__sub__` implement set union/difference by cloning and replaying `add`/`remove` for each element of the other set.
   - `__iter__` walks the trie (0-edges before 1-edges, tracking the accumulated IP prefix) and yields a `Cidr` at each leaf.
 
-See the "Implementation" section of `README.md` for a diagram-illustrated walkthrough of the collapse/expand behavior (figures generated into `doc/*.svg` via `make doc`).
+See the "Implementation" section of `README.md` for a diagram-illustrated walkthrough of the collapse/expand behavior (figures generated into `doc/*.svg` via `task doc`).
 
 ## Requirements
 
-Python 3.10+ (see `.python-version`). Runtime dependency: `binarytree`. Dev/test extras defined in `setup.py`: `pycodestyle==2.10.0` (dev), `pytest==7.2.1` + `pytest-cov==2.12.1` (test).
+Python 3.10+ (see `.python-version`). Dependencies and dev/test groups are declared in `pyproject.toml` and pinned in `uv.lock`. Runtime: `binarytree`, plus `setuptools<81` (binarytree imports the now-removed `pkg_resources` API without declaring the dependency itself). Dev group: `pycodestyle==2.10.0`. Test group: `pytest==7.2.1` + `pytest-cov==2.12.1`.

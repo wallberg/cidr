@@ -1,0 +1,30 @@
+version: '3'
+
+tasks:
+  sync:
+    desc: Install/update the local dev environment
+    cmds:
+      - uv sync --all-groups
+
+  test:
+    desc: Run unit tests
+    cmds:
+      - uv run pytest
+
+  lint:
+    desc: Run style checks
+    cmds:
+      - uv run pycodestyle --max-line-length=120 src tests
+
+  doc:
+    desc: Regenerate the trie diagrams in doc/
+    cmds:
+      - for: [fig1, fig2, fig3, fig4]
+        cmd: |
+          dot -Tdot doc/{{.ITEM}}.gv | gvpr -c -f doc/binaryTree.gvpr -o doc/{{.ITEM}}.dot
+          neato -n -Tsvg doc/{{.ITEM}}.dot -o doc/{{.ITEM}}.svg
+
+  clean:
+    desc: Remove generated doc artifacts
+    cmds:
+      - rm -f doc/*.svg doc/*.dot

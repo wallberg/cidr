@@ -4,7 +4,7 @@ Experimental library for storing and manipulating sets of [CIDR](https://en.wiki
 
 ## Usage
 
-See [test_cidr.py](test_cidr.py) for more comprehensive usage via testing.
+See [tests/test_cidr.py](tests/test_cidr.py) for more comprehensive usage via testing.
 
 ### Cidr Class
 
@@ -52,6 +52,16 @@ assert [str(cidr) for cidr in c] == [
         "64.0.0.0/2",
         "128.0.0.0/2"
 ]
+```
+
+## Development
+
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) and dev tasks are run with [Task](https://taskfile.dev/):
+
+```
+task sync   # install the dev environment
+task test   # run the test suite
+task lint   # run style checks
 ```
 
 ## Implementation
