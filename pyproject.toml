@@ -9,6 +9,7 @@ dependencies = [
     "binarytree==6.5.1",
     # binarytree imports pkg_resources at runtime but doesn't declare setuptools
     # as a dependency; setuptools>=81 dropped pkg_resources entirely.
+    "ruff>=0.16.6",
     "setuptools<81",
 ]
 

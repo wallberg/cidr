@@ -50,12 +50,7 @@ class Cidr:
         return self.ip >> (32-n) & 1
 
     def __str__(self):
-        return '{}.{}.{}.{}/{}'.format(
-            self.ip >> 24 & 255,
-            self.ip >> 16 & 255,
-            self.ip >> 8 & 255,
-            self.ip & 255,
-            self.bitmask)
+        return f'{self.ip >> 24 & 255}.{self.ip >> 16 & 255}.{self.ip >> 8 & 255}.{self.ip & 255}/{self.bitmask}'
 
     def __rep__(self):
         return str(self)
@@ -68,11 +63,7 @@ class Cidr:
         num_hosts = 2 ** (32 - self.bitmask)
         for i in range(num_hosts):
             ip_int = self.ip + i
-            yield '{}.{}.{}.{}'.format(
-                ip_int >> 24 & 255,
-                ip_int >> 16 & 255,
-                ip_int >> 8 & 255,
-                ip_int & 255)
+            yield f'{ip_int >> 24 & 255}.{ip_int >> 16 & 255}.{ip_int >> 8 & 255}.{ip_int & 255}'
 
 
 class CidrSet:

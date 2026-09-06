@@ -1,5 +1,6 @@
+from random import randint, seed, triangular
+
 import pytest
-from random import seed, randint, triangular
 
 from cidr import Cidr, CidrSet
 
@@ -457,7 +458,7 @@ def test_cidrset_eq():
     a = CidrSet()
 
     with pytest.raises(ValueError):
-        a == 1
+        assert a == 1
 
     b = CidrSet()
     assert a == b
