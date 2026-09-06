@@ -38,6 +38,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pycodestyle" },
+    { name = "pytest" },
 ]
 test = [
     { name = "pytest" },
@@ -52,7 +53,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pycodestyle", specifier = "==2.10.0" }]
+dev = [
+    { name = "pycodestyle", specifier = "==2.10.0" },
+    { name = "pytest", specifier = ">=7.2.1" },
+]
 test = [
     { name = "pytest", specifier = "==7.2.1" },
     { name = "pytest-cov", specifier = "==2.12.1" },
