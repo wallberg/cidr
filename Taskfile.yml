@@ -14,7 +14,8 @@ tasks:
   lint:
     desc: Run style checks
     cmds:
-      - uv run pycodestyle --max-line-length=120 src tests
+      - uv run ruff check --fix src tests
+      - uv run ruff format src tests
 
   doc:
     desc: Regenerate the trie diagrams in doc/
@@ -25,6 +26,6 @@ tasks:
           neato -n -Tsvg doc/{{.ITEM}}.dot -o doc/{{.ITEM}}.svg
 
   clean:
-    desc: Remove generated doc artifacts
+    desc: Remove generated intermediate doc artifacts
     cmds:
-      - rm -f doc/*.svg doc/*.dot
+      - rm -f doc/*.dot
