@@ -305,8 +305,7 @@ def test_cidrset_remove():
 
     s.add(Cidr("0.0.0.0/0"))
     s.remove(Cidr("0.0.0.0/0"))
-    assert [str(cidr) for cidr in s] == [
-    ]
+    assert [str(cidr) for cidr in s] == []
 
     s.add(Cidr("0.0.0.0/0"))
     s.remove(Cidr("255.0.0.0/1"))
@@ -357,8 +356,7 @@ def test_cidrset_remove():
     ]
 
     s.remove(Cidr("0.0.0.0/0"))
-    assert [str(cidr) for cidr in s] == [
-    ]
+    assert [str(cidr) for cidr in s] == []
 
     s.add(Cidr("0.0.0.0/3"))
     s.add(Cidr("64.0.0.0/3"))
@@ -373,8 +371,7 @@ def test_cidrset_remove():
     ]
 
     s.remove(Cidr("64.0.0.0/2"))
-    assert [str(cidr) for cidr in s] == [
-    ]
+    assert [str(cidr) for cidr in s] == []
 
     s.add(Cidr("0.0.0.0/32"))
     s.add(Cidr("255.255.255.255/32"))
@@ -389,8 +386,7 @@ def test_cidrset_remove():
     ]
 
     s.remove(Cidr("0.0.0.0/32"))
-    assert [str(cidr) for cidr in s] == [
-    ]
+    assert [str(cidr) for cidr in s] == []
 
     s = CidrSet()
     s.add(Cidr("0.0.0.0/32"))
@@ -445,10 +441,7 @@ def test_cidrset_suboperator():
     b.add(Cidr("0.0.0.0/2"))
     b.add(Cidr("255.255.255.255/2"))
     s = a - b
-    assert [str(cidr) for cidr in s] == [
-        "64.0.0.0/2",
-        "128.0.0.0/2"
-    ]
+    assert [str(cidr) for cidr in s] == ["64.0.0.0/2", "128.0.0.0/2"]
 
     s = a - b - a
     assert len(s) == 0
@@ -490,7 +483,7 @@ def test_cidrset_iter():
 
 
 def test_cidrset_ops():
-    """ Compare results of add/remove ops vs __add__/__sub__ ops. """
+    """Compare results of add/remove ops vs __add__/__sub__ ops."""
 
     a = CidrSet()
     b = CidrSet()
@@ -526,11 +519,14 @@ def test_cidrset_ops():
     seed(0)
     for i in range(100):
         cidr = Cidr(
-            ip = randint(0,255) * 256**3 + randint(0,255) * 256**2 + randint(0,255) * 256**1 + randint(0,255) * 256**0,
-            bitmask = int(triangular(8,33,33))
+            ip=randint(0, 255) * 256**3
+            + randint(0, 255) * 256**2
+            + randint(0, 255) * 256**1
+            + randint(0, 255) * 256**0,
+            bitmask=int(triangular(8, 33, 33)),
         )
 
-        if randint(0,1) == 0:
+        if randint(0, 1) == 0:
             a.add(cidr)
         else:
             b.add(cidr)
@@ -548,9 +544,8 @@ def test_cidrset_ops():
     for cidr in a:
         # Flip the final bit
         cidr_new = Cidr(
-            ip = cidr.ip ^ 2**(32-cidr.bitmask),
-            bitmask = cidr.bitmask,
+            ip=cidr.ip ^ 2 ** (32 - cidr.bitmask),
+            bitmask=cidr.bitmask,
         )
         b.add(cidr_new)
         test_both()
-

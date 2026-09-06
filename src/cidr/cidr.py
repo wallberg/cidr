@@ -2,36 +2,36 @@ import re
 
 from binarytree import Node
 
-cidrPattern = re.compile(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2}))?$')
+cidrPattern = re.compile(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2}))?$")
 
 
 class Cidr:
-    """ Represent a single CIDR address as an integer IP part and the number of bits in the bitmask. """
+    """Represent a single CIDR address as an integer IP part and the number of bits in the bitmask."""
 
     def __init__(self, s=None, ip=None, bitmask=None):
 
         if s is None:
             if ip is None or bitmask is None:
-                raise ValueError('Must provide parameter: s or (ip and bitmask)')
+                raise ValueError("Must provide parameter: s or (ip and bitmask)")
 
             self.ip = ip
             if not isinstance(ip, int) or ip < 0 or ip >= 2**32:
-                raise ValueError(f'Invalid ip: {ip}')
+                raise ValueError(f"Invalid ip: {ip}")
 
             self.bitmask = bitmask
             if not isinstance(ip, int) or bitmask < 0 or bitmask > 32:
-                raise ValueError(f'Invalid bitmask: {bitmask}')
+                raise ValueError(f"Invalid bitmask: {bitmask}")
 
         else:
             if (m := cidrPattern.match(s)) is None:
-                raise ValueError(f'Invalid cidr format: {s}')
+                raise ValueError(f"Invalid cidr format: {s}")
 
             # Extract the IP address
             self.ip = 0
             for i in (1, 2, 3, 4):
                 octet = int(m[i])
                 if octet < 0 or octet > 255:
-                    raise ValueError(f'Invalid cidr octet format: {octet}')
+                    raise ValueError(f"Invalid cidr octet format: {octet}")
                 self.ip *= 256
                 self.ip += octet
 
@@ -43,14 +43,14 @@ class Cidr:
                     raise ValueError("Invalid cidr bitmask (0-32): {self.bitmask}")
 
         # Normalize the IP by zeroing out the bits not covered by the bitmask
-        self.ip = (self.ip >> (32-self.bitmask)) << (32-self.bitmask)
+        self.ip = (self.ip >> (32 - self.bitmask)) << (32 - self.bitmask)
 
     def bit(self, n):
-        """ n-th bit in this cidr (1-32). """
-        return self.ip >> (32-n) & 1
+        """n-th bit in this cidr (1-32)."""
+        return self.ip >> (32 - n) & 1
 
     def __str__(self):
-        return f'{self.ip >> 24 & 255}.{self.ip >> 16 & 255}.{self.ip >> 8 & 255}.{self.ip & 255}/{self.bitmask}'
+        return f"{self.ip >> 24 & 255}.{self.ip >> 16 & 255}.{self.ip >> 8 & 255}.{self.ip & 255}/{self.bitmask}"
 
     def __rep__(self):
         return str(self)
@@ -59,15 +59,15 @@ class Cidr:
         return self.ip == b.ip and self.bitmask == b.bitmask
 
     def __iter__(self):
-        """ Iterate over all individual IP addresses in this CIDR range. """
+        """Iterate over all individual IP addresses in this CIDR range."""
         num_hosts = 2 ** (32 - self.bitmask)
         for i in range(num_hosts):
             ip_int = self.ip + i
-            yield f'{ip_int >> 24 & 255}.{ip_int >> 16 & 255}.{ip_int >> 8 & 255}.{ip_int & 255}'
+            yield f"{ip_int >> 24 & 255}.{ip_int >> 16 & 255}.{ip_int >> 8 & 255}.{ip_int & 255}"
 
 
 class CidrSet:
-    """ Represent a set of CIDR ranges as a binary tree. """
+    """Represent a set of CIDR ranges as a binary tree."""
 
     def __init__(self, *args):
         # Start empty
@@ -76,12 +76,12 @@ class CidrSet:
         self.extend(args)
 
     def extend(self, args):
-        """ Add several items at once. """
+        """Add several items at once."""
         for arg in args:
             self.add(arg)
 
     def contains(self, cidr):
-        """ Test if this cidr is in the set, ie every IP in the cidr is in the set. """
+        """Test if this cidr is in the set, ie every IP in the cidr is in the set."""
 
         if type(cidr) is not Cidr:
             return False
@@ -92,7 +92,7 @@ class CidrSet:
         return self._contains(self.root, cidr)
 
     def _contains(self, node, cidr):
-        """ Recursively test if this Cidr node is in the set. """
+        """Recursively test if this Cidr node is in the set."""
 
         # Base case, we've reached a leaf node
         if node.left is None and node.right is None:
@@ -103,7 +103,7 @@ class CidrSet:
             return False
 
         # Get depth and bit for the child node
-        depth = node.value+1
+        depth = node.value + 1
         bit = cidr.bit(depth)
 
         if bit == 0:
@@ -118,7 +118,7 @@ class CidrSet:
     __contains__ = contains
 
     def add(self, cidr):
-        """ Add a new cidr to the set. """
+        """Add a new cidr to the set."""
 
         # Store the depth in node.value and the bit values
         # are implied on the edges by node.left (0 bit) and node.right (1 bit)
@@ -130,7 +130,7 @@ class CidrSet:
             self._add(self.root, False, cidr)
 
     def _add(self, node, newnode, cidr):
-        """ Recursively add a new CIDR node to the set. """
+        """Recursively add a new CIDR node to the set."""
 
         # Base case, we've added a node for every bit, no more children
         # Existing children can be deleted
@@ -144,7 +144,7 @@ class CidrSet:
             return
 
         # Get depth and bit for the child node
-        depth = node.value+1
+        depth = node.value + 1
         bit = cidr.bit(depth)
 
         # Add a new child node
@@ -164,22 +164,26 @@ class CidrSet:
         self._add(child, newnode, cidr)
 
         # Check if a collapse is necessary because both child nodes are leaf nodes
-        if (node.left is not None and node.right is not None
-           and node.left.left is None and node.left.right is None
-           and node.right.left is None and node.right.right is None):
-
+        if (
+            node.left is not None
+            and node.right is not None
+            and node.left.left is None
+            and node.left.right is None
+            and node.right.left is None
+            and node.right.right is None
+        ):
             node.left = None
             node.right = None
 
     def clone(self):
-        """ Make a clone of this CidrSet. """
+        """Make a clone of this CidrSet."""
         c = CidrSet()
         if self.root is not None:
             c.root = self.root.clone()
         return c
 
     def __add__(self, b):
-        """ Support the addition operator, for two CidrSet objects. """
+        """Support the addition operator, for two CidrSet objects."""
         if type(b) is not CidrSet:
             raise ValueError("Second operand is not of type CidrSet")
 
@@ -189,7 +193,7 @@ class CidrSet:
         return c
 
     def __sub__(self, b):
-        """ Support the subtraction operator, for two CidrSet objects. """
+        """Support the subtraction operator, for two CidrSet objects."""
         if type(b) is not CidrSet:
             raise ValueError("Second operand is not of type CidrSet")
 
@@ -199,7 +203,7 @@ class CidrSet:
         return c
 
     def remove(self, cidr: Cidr):
-        """ Remove a Cidr node from the set. """
+        """Remove a Cidr node from the set."""
 
         if self.root is None:
             # Set is already empty
@@ -209,7 +213,7 @@ class CidrSet:
             self.root = None
 
     def _remove(self, node, cidr):
-        """ Recursively remove a Cidr node from the set.
+        """Recursively remove a Cidr node from the set.
         Returns True if this node should be removed.
         """
 
@@ -219,7 +223,7 @@ class CidrSet:
             return True
 
         # Get depth and bit for the child node
-        depth = node.value+1
+        depth = node.value + 1
         bit = cidr.bit(depth)
 
         if bit == 0:
@@ -257,11 +261,11 @@ class CidrSet:
         return False
 
     def __len__(self):
-        """ Support the len() function. """
+        """Support the len() function."""
         return self.size()
 
     def size(self) -> int:
-        """ Return the number of cidrs in this set. """
+        """Return the number of cidrs in this set."""
         if self.root is None:
             return 0
 
@@ -287,7 +291,7 @@ class CidrSet:
             return False
 
     def __iter__(self, node=None, ip=None):
-        """ Return an iterator over Cidr values in this set. """
+        """Return an iterator over Cidr values in this set."""
 
         if node is None:
             if self.root is None:
@@ -305,5 +309,5 @@ class CidrSet:
                 yield from self.__iter__(node=node.left, ip=ip)
 
             if node.right is not None:
-                ip += 2**(32-node.right.value)
+                ip += 2 ** (32 - node.right.value)
                 yield from self.__iter__(node=node.right, ip=ip)
